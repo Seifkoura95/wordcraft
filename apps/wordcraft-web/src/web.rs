@@ -44,7 +44,7 @@ pub fn start() {
                     let doc = if query().contains("sample") { wordcraft_engine::sample::sample_document() } else { wordcraft_doc::Document::new() };
                     let mut app = WordApp::new(Session::new(doc), services(inbox.clone(), cc.egui_ctx.clone()));
                     app.autosave = false;
-                    Ok(Box::new(WebShell { app, inbox }))
+                    Ok(Box::new(WebShell { app, inbox, theme: None }))
                 }),
             )
             .await;
@@ -67,10 +67,18 @@ fn query() -> String {
 struct WebShell {
     app: WordApp,
     inbox: Inbox,
+    /// A theme change requested by the host (`true` = dark), applied on the next frame.
+    theme: Option<ThemeRequest>,
 }
+
+/// Shared with the host-facing handle; `Some(dark)` until the app picks it up.
+type ThemeRequest = std::rc::Rc<std::cell::Cell<Option<bool>>>;
 
 impl eframe::App for WebShell {
     fn logic(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        if let Some(dark) = self.theme.as_ref().and_then(|t| t.take()) {
+            self.app.ui.dark = dark;
+        }
         let dropped = ctx.input_mut(|i| std::mem::take(&mut i.raw.dropped_files));
         for f in dropped {
             let inbox = self.inbox.clone();
@@ -176,11 +184,15 @@ fn mime_for(name: &str) -> &'static str {
 }
 
 /// Simple Write inside SimpleHub. The page mounts the app on a canvas it owns and hands over a
-/// bridge object (`open(): Promise<{name, bytes}|null>`, `save(name, bytes): Promise<void>`) that
-/// moves documents to and from Simple Cloud; nothing here touches the browser's file picker.
+/// bridge object (`open(): Promise<{name, bytes}|null>`, `save(name, bytes): Promise<void>`,
+/// optional `theme: "dark" | "light"`) that moves documents to and from Simple Cloud; nothing
+/// here touches the browser's file picker.
 #[cfg(feature = "simplehub")]
 mod simplehub {
-    use super::{Inbox, Services, Session, WebShell, WordApp};
+    use std::cell::{Cell, RefCell};
+    use std::rc::Rc;
+
+    use super::{Inbox, Services, Session, ThemeRequest, WebShell, WordApp};
     use wasm_bindgen::JsCast as _;
     use wasm_bindgen::prelude::*;
     use wasm_bindgen_futures::JsFuture;
@@ -189,6 +201,8 @@ mod simplehub {
     #[wasm_bindgen]
     pub struct WriteHandle {
         runner: eframe::WebRunner,
+        theme: ThemeRequest,
+        ctx: Rc<RefCell<Option<egui::Context>>>,
     }
 
     #[wasm_bindgen]
@@ -200,26 +214,58 @@ mod simplehub {
         pub fn has_panicked(&self) -> bool {
             self.runner.has_panicked()
         }
+
+        /// Switch the running app to `"dark"` or `"light"` on its next frame.
+        pub fn set_theme(&self, theme: &str) {
+            let Some(dark) = parse_theme(theme) else {
+                log::warn!("SimpleHub: ignoring unknown theme {theme:?}");
+                return;
+            };
+            self.theme.set(Some(dark));
+            if let Some(ctx) = self.ctx.borrow().as_ref() {
+                ctx.request_repaint();
+            }
+        }
     }
 
-    /// Starts Simple Write on `canvas`, with `bridge` providing open and save.
+    /// `"dark"` → dark, `"light"` → light; anything else is ignored.
+    fn parse_theme(theme: &str) -> Option<bool> {
+        match theme.trim().to_ascii_lowercase().as_str() {
+            "dark" => Some(true),
+            "light" => Some(false),
+            _ => None,
+        }
+    }
+
+    /// Starts Simple Write on `canvas`, with `bridge` providing open and save (and, optionally,
+    /// the initial `theme`).
     #[wasm_bindgen]
     pub async fn start_simple_write(canvas: web_sys::HtmlCanvasElement, bridge: JsValue) -> Result<WriteHandle, JsValue> {
         eframe::WebLogger::init(log::LevelFilter::Info).ok();
+        let initial_dark = js_sys::Reflect::get(&bridge, &JsValue::from_str("theme")).ok().and_then(|v| v.as_string()).and_then(|s| parse_theme(&s));
+        let theme: ThemeRequest = Rc::new(Cell::new(None));
+        let ctx: Rc<RefCell<Option<egui::Context>>> = Rc::new(RefCell::new(None));
         let runner = eframe::WebRunner::new();
+        let app_theme = theme.clone();
+        let app_ctx = ctx.clone();
         runner
             .start(
                 canvas,
                 eframe::WebOptions::default(),
                 Box::new(move |cc| {
+                    *app_ctx.borrow_mut() = Some(cc.egui_ctx.clone());
                     let inbox: Inbox = Inbox::default();
                     let mut app = WordApp::new(Session::new(wordcraft_doc::Document::new()), services(bridge, inbox.clone(), cc.egui_ctx.clone()));
                     app.autosave = false;
-                    Ok(Box::new(WebShell { app, inbox }))
+                    // Applied by `WordApp::logic` before the first frame is painted.
+                    if let Some(dark) = initial_dark {
+                        app.ui.dark = dark;
+                    }
+                    Ok(Box::new(WebShell { app, inbox, theme: Some(app_theme) }))
                 }),
             )
             .await?;
-        Ok(WriteHandle { runner })
+        Ok(WriteHandle { runner, theme, ctx })
     }
 
     fn services(bridge: JsValue, inbox: Inbox, ctx: egui::Context) -> Services {

@@ -167,6 +167,10 @@ pub fn regular(size: f32) -> FontId {
 
 /// Apply tokens to egui's style.
 pub fn apply(ctx: &egui::Context, t: &Tokens) {
+    // Pin egui's theme before touching the visuals. egui follows the system theme by default
+    // and `set_visuals` only styles the active one, so without this a system theme change
+    // (or a system theme that disagrees with ours) would drop back to egui's stock visuals.
+    ctx.set_theme(if t.dark { egui::Theme::Dark } else { egui::Theme::Light });
     let mut v = if t.dark { Visuals::dark() } else { Visuals::light() };
     v.panel_fill = t.ribbon;
     v.window_fill = t.menu;
