@@ -270,7 +270,8 @@ pub fn show(app: &mut WordApp, ctx: &egui::Context) {
     let Some(mut d) = app.dialog.take() else { return };
     let mut open = true;
     let mut close = false;
-    let title = match &d {
+    let about_title = format!("About {}", crate::APP_NAME);
+    let title: &str = match &d {
         Dialog::Font { .. } => "Font",
         Dialog::Paragraph { .. } => "Paragraph",
         Dialog::Find { replace_mode: false, .. } => "Find",
@@ -286,7 +287,7 @@ pub fn show(app: &mut WordApp, ctx: &egui::Context) {
         Dialog::NewStyle { .. } => "Create New Style",
         Dialog::ModifyStyle { .. } => "Modify Style",
         Dialog::Commands { .. } => "Search Commands",
-        Dialog::About { .. } => "About WordCraft",
+        Dialog::About { .. } => &about_title,
     };
     egui::Window::new(title).collapsible(false).resizable(false).anchor(egui::Align2::CENTER_CENTER, vec2(0.0, -40.0)).open(&mut open).show(
         ctx,
@@ -714,6 +715,17 @@ fn body(app: &mut WordApp, ui: &mut Ui, d: &mut Dialog) -> bool {
             match *tab {
                 1 => crate::credits::contributors_ui(ui),
                 2 => crate::credits::models_ui(ui),
+                _ if cfg!(feature = "simplehub") => {
+                    // SimpleHub build. WordCraft is MIT OR Apache-2.0; the licence asks for
+                    // attribution and the ArtCraft marks are left out (they are not open source).
+                    ui.label(egui::RichText::new(crate::APP_NAME).font(semibold(22.0)));
+                    ui.label(format!("Version {}", env!("CARGO_PKG_VERSION")));
+                    ui.add_space(6.0);
+                    ui.label("Documents for SimpleHub. Native DOCX, styles, tables, pictures and PDF export.");
+                    ui.add_space(6.0);
+                    ui.label("Built on WordCraft, an open source word processor by the ArtCraft Team and the WordCraft contributors, used under the MIT or Apache 2.0 licence.");
+                    ui.hyperlink_to("github.com/storytold/wordcraft", "https://github.com/storytold/wordcraft");
+                }
                 _ => {
                     ui.label(egui::RichText::new("WordCraft").font(semibold(22.0)));
                     ui.label(format!(

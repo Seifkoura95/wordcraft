@@ -25,6 +25,10 @@ use wordcraft_engine::Session;
 
 pub use control::ControlRequest;
 
+/// The name shown to the user in titles, message boxes and the About dialog.
+/// The `simplehub` feature builds the app as Simple Write inside SimpleHub.
+pub const APP_NAME: &str = if cfg!(feature = "simplehub") { "Simple Write" } else { "WordCraft" };
+
 /// Platform services injected by the host (file dialogs, file I/O).
 #[derive(Default)]
 pub struct Services {
@@ -385,7 +389,7 @@ impl WordApp {
         if let Some(url) = self.canvas.open_url.take() {
             ctx.open_url(egui::OpenUrl::new_tab(url));
         }
-        let title = format!("{}{} - WordCraft", self.title_stem(), if self.session.dirty { " •" } else { "" });
+        let title = format!("{}{} - {}", self.title_stem(), if self.session.dirty { " •" } else { "" }, APP_NAME);
         ctx.send_viewport_cmd(egui::ViewportCommand::Title(title));
         self.frame_ms = now_ms() - t0;
     }

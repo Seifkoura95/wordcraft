@@ -27,3 +27,7 @@ image = { workspace = true }
 [build-dependencies]
 serde_json = { workspace = true }
 toml = "1"
+
+[features]
+# SimpleHub build: user-facing name "Simple Write", About dialog credits WordCraft.
+simplehub = []
