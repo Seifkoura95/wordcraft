@@ -138,7 +138,7 @@ Insert|Pages|Page Break|insert.pageBreak
 Insert|Tables|Insert Table|insert.table
 Insert|Tables|Draw Table|table.draw
 Insert|Tables|Convert Text to Table|table.fromText
-Insert|Tables|Excel Spreadsheet|insert.spreadsheet
+Insert|Tables|Spreadsheet Table|insert.spreadsheet
 Insert|Tables|Quick Tables|table.quick
 Insert|Illustrations|Pictures|insert.picture
 Insert|Illustrations|Online Pictures|insert.onlinePicture

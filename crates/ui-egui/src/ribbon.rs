@@ -60,7 +60,7 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                         egui::Color32::WHITE,
                     );
                     ui.painter().text(pos2(r.min.x + 26.0, r.center().y), Align2::LEFT_CENTER, "Share", medium(12.0), egui::Color32::WHITE);
-                    if resp.on_hover_text("Export a copy to share (PDF, Word document)").clicked() {
+                    if resp.on_hover_text("Export a copy to share (PDF, DOCX)").clicked() {
                         let _ = app.run("ui.backstage", json!({"value": true, "page": "export"}));
                     }
                     ui.add_space(6.0);
@@ -573,7 +573,7 @@ fn layout(app: &mut WordApp, ui: &mut Ui) {
                 ("Moderate", "moderate"),
                 ("Wide", "wide"),
                 ("Mirrored", "mirrored"),
-                ("Office 2003 Default", "office2003"),
+                ("Classic", "office2003"),
             ] {
                 mi(ui, app, l, "layout.margins", json!({"preset": k}));
             }

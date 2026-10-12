@@ -32,6 +32,6 @@ pub enum DocxError {
     #[error("limit exceeded: {0}")]
     Limit(String),
     /// The package is readable but isn't a WordprocessingML document.
-    #[error("not a Word document: {0}")]
+    #[error("not a DOCX document: {0}")]
     NotWord(String),
 }

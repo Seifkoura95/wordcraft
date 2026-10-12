@@ -24,6 +24,10 @@ use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
 
+/// The application named in metadata written into saved and exported files (DOCX `Application`,
+/// PDF creator and producer, ODT and HTML `generator`): the `simplehub` feature names Simple Write.
+pub const PRODUCT_NAME: &str = if cfg!(feature = "simplehub") { "Simple Write" } else { "WordCraft" };
+
 pub use numbering::{ListKind, Numbering};
 pub use para::{InlineObject, Paragraph, Run};
 pub use props::{Align, CharProps, ParaProps, Rgb, TextColor};

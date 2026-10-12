@@ -724,6 +724,7 @@ fn body(app: &mut WordApp, ui: &mut Ui, d: &mut Dialog) -> bool {
                     ui.label("Documents for SimpleHub. Native DOCX, styles, tables, pictures and PDF export.");
                     ui.add_space(6.0);
                     ui.label("Built on WordCraft, an open source word processor by the ArtCraft Team and the WordCraft contributors, used under the MIT or Apache 2.0 licence.");
+                    ui.label("Not affiliated with or endorsed by Adobe, Microsoft, Autodesk or Avid. Other product names are trademarks of their respective owners.");
                     ui.hyperlink_to("github.com/storytold/wordcraft", "https://github.com/storytold/wordcraft");
                 }
                 _ => {

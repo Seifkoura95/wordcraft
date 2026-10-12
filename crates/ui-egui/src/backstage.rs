@@ -231,7 +231,7 @@ fn export_page(app: &mut WordApp, ui: &mut Ui) {
     ui.add_space(12.0);
     for (label, ext) in [
         ("PDF document (*.pdf)", "pdf"),
-        ("Word document (*.docx)", "docx"),
+        ("DOCX document (*.docx)", "docx"),
         ("OpenDocument Text (*.odt)", "odt"),
         ("Rich Text Format (*.rtf)", "rtf"),
         ("Web page (*.html)", "html"),

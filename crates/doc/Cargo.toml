@@ -17,3 +17,7 @@ unicode-segmentation = { workspace = true }
 
 [dev-dependencies]
 proptest = { workspace = true }
+
+[features]
+# SimpleHub build: metadata written into saved and exported files names Simple Write.
+simplehub = []

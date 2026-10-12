@@ -167,7 +167,7 @@ pub fn specs() -> Vec<CommandSpec> {
         .pure(),
         CommandSpec::new("file.share", "Share", "File", |s, _| {
             s.ui_requests.push(json!({"open": "saveAs"}));
-            Ok(json!({"hint": "Save or export a copy (PDF, Word document) to share it."}))
+            Ok(json!({"hint": "Save or export a copy (PDF, DOCX) to share it."}))
         })
         .pure(),
         CommandSpec::new("file.encrypt", "Encrypt with Password", "File › Info › Protect Document", |s, _| {

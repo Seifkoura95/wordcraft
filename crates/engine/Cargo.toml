@@ -24,3 +24,7 @@ thiserror = { workspace = true }
 log = { workspace = true }
 regex = { workspace = true }
 image = { workspace = true }
+
+[features]
+# SimpleHub build: metadata written into saved and exported files names Simple Write.
+simplehub = ["wordcraft-doc/simplehub"]

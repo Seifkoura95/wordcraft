@@ -82,7 +82,7 @@ fn services() -> Services {
                 d.add_filter("Pictures", &["png", "jpg", "jpeg", "gif", "webp", "bmp"])
             } else {
                 d.add_filter("Documents", &["docx", "docm", "dotx", "odt", "rtf", "txt", "md", "html", "htm", "json"])
-                    .add_filter("Word document", &["docx"])
+                    .add_filter("DOCX document", &["docx"])
                     .add_filter("All files", &["*"])
             };
             d.pick_file().map(|p| p.to_string_lossy().to_string())

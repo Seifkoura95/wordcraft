@@ -30,7 +30,7 @@ fn italic() -> CharProps {
 pub fn sample_document() -> Document {
     let mut d = Document::new();
     d.core.title = "The Open Studio Handbook".into();
-    d.core.creator = "WordCraft".into();
+    d.core.creator = wordcraft_doc::PRODUCT_NAME.into();
     let mut b: Vec<Block> = Vec::new();
     b.push(Block::Para(styled("The Open Studio Handbook", "Title")));
     b.push(Block::Para(styled("How a small community of makers shares space, tools and time", "Subtitle")));
@@ -163,9 +163,9 @@ pub fn letter() -> Document {
 pub fn resume() -> Document {
     let mut d = Document::new();
     let mut b: Vec<Block> =
-        vec![Block::Para(styled("Alex Rivera", "Title")), Block::Para(para("Illustrator · alex@example.com · portfolio.example.com"))];
+        vec![Block::Para(styled("Alex Rivera", "Title")), Block::Para(para("Book artist · alex@example.com · portfolio.example.com"))];
     for (head, items) in [
-        ("Experience", vec![("Lead Illustrator, Harbor Books", "2021 – present"), ("Freelance Illustrator", "2016 – 2021")]),
+        ("Experience", vec![("Lead Book Artist, Harbor Books", "2021 – present"), ("Freelance Artist", "2016 – 2021")]),
         ("Education", vec![("BFA Illustration, Coastal College of Art", "2016")]),
         ("Skills", vec![("Ink, gouache, digital painting, book layout, lettering", "")]),
     ] {
